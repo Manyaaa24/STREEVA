@@ -1,0 +1,1 @@
+{"h3_cell": "89618c444a3ffff", "data_type": "osm", "cached_at": 1785501671.2369235, "data": {"dominant_highway": "service", "all_highway_tags": ["path", "primary_link", "primary", "service"], "total_road_length_m": 14286.61, "road_density_m_per_km2": 18190.28, "junction_density_per_km2": 76.39, "node_count": 72, "edge_count": 168, "search_radius_m": 500, "area_km2": 0.7854}}

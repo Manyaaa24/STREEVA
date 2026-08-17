@@ -1,0 +1,101 @@
+# ============================================================
+# STREEVA — Scoring Weights Configuration
+# ============================================================
+# All risk weights and classification thresholds are defined here.
+# Changing this file does NOT require any code changes.
+#
+# The final risk score formula is:
+#   RawScore = Σ (weight_i × normalized_feature_i)
+#   FinalScore = clamp(RawScore × time_multiplier × macro_multiplier, 0, 100)
+#
+# WEIGHTS MUST SUM TO 1.0
+# Justification for each weight is documented below.
+# ============================================================
+
+weights:
+  # Crime Baseline (0.20)
+  # Why: Historical IPC crime data establishes how dangerous this
+  # district is relative to others in Tamil Nadu. It is a prior.
+  # However it cannot be hyperlocal, so capped at 20%.
+  crime_baseline: 0.20
+
+  # Isolation Score (0.25)
+  # Why: The single strongest predictor of danger in an area.
+  # An isolated, unlit service lane with no road network is the
+  # textbook high-risk location. Weighted highest.
+  isolation: 0.25
+
+  # Commercial Density (0.15)
+  # Why: Jane Jacobs' "eyes on the street" principle — active businesses
+  # mean people present, lights on, witnesses to incidents.
+  # Inverted: high commercial density → low risk contribution.
+  commercial_density: 0.15
+
+  # Police Distance (0.20)
+  # Why: Proximity to law enforcement is a strong deterrent and
+  # response-time factor. Second-highest weight after isolation.
+  police_distance: 0.20
+
+  # Hospital Distance (0.10)
+  # Why: Proximity to medical help matters but is a secondary safety
+  # factor — it affects outcomes, not incident probability.
+  hospital_distance: 0.10
+
+  # Population Density (0.10)
+  # Why: Dense residential areas have more witnesses and informal
+  # social control. Lower weight because it correlates with
+  # commercial density and is less directly actionable.
+  population_density: 0.10
+
+  # Time Multiplier is NOT a weighted feature — it is an explicit
+  # multiplicative modifier applied to the final score.
+  # See configs/city_config.yaml for time band values.
+
+
+# ============================================================
+# Risk Classification Thresholds
+# ============================================================
+# Score ranges define the classification labels.
+# Adjust these to calibrate the model's sensitivity.
+thresholds:
+  low: 25       # 0–25   → Low
+  medium: 50    # 26–50  → Medium
+  high: 75      # 51–75  → High
+                # 76–100 → Critical
+
+
+# ============================================================
+# Feature Normalization Parameters
+# ============================================================
+normalization:
+  # Police distance: sigmoid midpoint (meters)
+  # At this distance, risk contribution is 50 pts.
+  police_sigmoid_midpoint_m: 2500
+
+  # Police distance: sigmoid steepness
+  police_sigmoid_k: 0.001
+
+  # Hospital distance: sigmoid midpoint (meters)
+  hospital_sigmoid_midpoint_m: 3000
+  hospital_sigmoid_k: 0.001
+
+  # Commercial density: count at which risk contribution reaches 0
+  # Locations with ≥ this many active POIs within search radius = minimum risk
+  commercial_density_max_pois: 20
+
+  # Road type risk scores (0–100, higher = riskier)
+  # Based on OSM highway tag classification
+  road_type_scores:
+    motorway: 5
+    trunk: 8
+    primary: 15
+    secondary: 25
+    tertiary: 35
+    residential: 50
+    living_street: 45
+    service: 70
+    track: 85
+    path: 90
+    footway: 80
+    unclassified: 60
+    default: 65   # fallback for unknown types

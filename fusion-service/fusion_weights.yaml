@@ -1,0 +1,4 @@
+fusion_weights:
+  area_risk: 0.60
+  motion_anomaly: 0.40
+  audio_distress: 0.00 # Placeholder for Phase 3

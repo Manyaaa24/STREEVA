@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREEVA Trip Logger</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f5f5f5; color: #333; max-width: 500px; margin: 0 auto; }
+        h2 { margin-top: 0; color: #2c3e50; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input, button { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        button { background: #3498db; color: white; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #2980b9; }
+        button:disabled { background: #95a5a6; cursor: not-allowed; }
+        .btn-stop { background: #e74c3c; }
+        .btn-stop:hover { background: #c0392b; }
+        .btn-export { background: #27ae60; }
+        .btn-export:hover { background: #219653; }
+        .status { padding: 10px; border-radius: 4px; background: #ecf0f1; margin-bottom: 15px; font-size: 14px; }
+        .status.recording { background: #ffeaa7; color: #d35400; font-weight: bold; }
+        .log-count { font-weight: normal; float: right; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <h2>STREEVA Trip Logger</h2>
+    
+    <div class="card">
+        <label for="tripLabel">Trip Label</label>
+        <select id="tripLabel">
+            <option value="normal">Normal (Walking smoothly)</option>
+            <option value="deviated">Deviated (Walking off-route)</option>
+            <option value="stop-test">Stop-Test (Standing still >30s)</option>
+            <option value="anomalous">Anomalous (Erratic / Running / Stairs)</option>
+        </select>
+
+        <label for="serverUrl">Fusion Service URL (optional)</label>
+        <input type="text" id="serverUrl" placeholder="http://192.168.X.X:8001/log-trip" value="http://localhost:8001/log-trip">
+
+        <div id="statusIndicator" class="status">Ready to record</div>
+
+        <button id="btnStart">Start Recording</button>
+        <button id="btnStop" class="btn-stop" style="display: none;">Stop Recording</button>
+        <button id="btnExport" class="btn-export" style="display: none;">Export JSON</button>
+        <button id="btnSync" style="display: none;">Sync to Server</button>
+    </div>
+
+    <div class="card">
+        <label>Real-time Sensors <span class="log-count" id="pointCount">0 points</span></label>
+        <div style="font-size: 12px; font-family: monospace; line-height: 1.5; color: #555;">
+            LAT: <span id="valLat">--</span><br>
+            LNG: <span id="valLng">--</span><br>
+            ACCEL (X,Y,Z): <span id="valAccel">--</span>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+        let tripPoints = [];
+        let tripStartTime = null;
+        let geoWatchId = null;
+        
+        let currentLat = null;
+        let currentLng = null;
+        let currentAccel = { x: 0, y: 0, z: 0 };
+        let pointInterval = null;
+
+        const btnStart = document.getElementById('btnStart');
+        const btnStop = document.getElementById('btnStop');
+        const btnExport = document.getElementById('btnExport');
+        const btnSync = document.getElementById('btnSync');
+        const statusInd = document.getElementById('statusIndicator');
+
+        // Note: DeviceMotionEvent requires HTTPS or localhost
+        async function requestDeviceMotionPermission() {
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceMotionEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        alert("Accelerometer permission denied.");
+                        return false;
+                    }
+                } catch (e) {
+                    alert("Error requesting motion permission: " + e.message);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        btnStart.addEventListener('click', async () => {
+            const hasPermission = await requestDeviceMotionPermission();
+            if (!hasPermission) return;
+
+            tripPoints = [];
+            tripStartTime = new Date().toISOString();
+            isRecording = true;
+            
+            btnStart.style.display = 'none';
+            btnStop.style.display = 'block';
+            btnExport.style.display = 'none';
+            btnSync.style.display = 'none';
+            document.getElementById('tripLabel').disabled = true;
+
+            statusInd.textContent = "🔴 Recording... Walk your route.";
+            statusInd.classList.add('recording');
+
+            // 1. Listen to GPS updates
+            if ("geolocation" in navigator) {
+                geoWatchId = navigator.geolocation.watchPosition((pos) => {
+                    currentLat = pos.coords.latitude;
+                    currentLng = pos.coords.longitude;
+                    document.getElementById('valLat').textContent = currentLat.toFixed(6);
+                    document.getElementById('valLng').textContent = currentLng.toFixed(6);
+                }, (err) => console.warn(err), { enableHighAccuracy: true });
+            } else {
+                alert("Geolocation not supported.");
+            }
+
+            // 2. Listen to Accelerometer (DeviceMotion)
+            window.addEventListener("devicemotion", handleMotion, true);
+
+            // 3. Log a point every 1 second
+            pointInterval = setInterval(() => {
+                if (currentLat !== null && currentLng !== null) {
+                    tripPoints.push({
+                        timestamp: new Date().toISOString(),
+                        lat: currentLat,
+                        lng: currentLng,
+                        accel_x: currentAccel.x,
+                        accel_y: currentAccel.y,
+                        accel_z: currentAccel.z
+                    });
+                    document.getElementById('pointCount').textContent = tripPoints.length + " points";
+                }
+            }, 1000);
+        });
+
+        function handleMotion(event) {
+            // Include gravity if acceleration without gravity is not available
+            let acc = event.acceleration || event.accelerationIncludingGravity;
+            if (acc) {
+                currentAccel.x = acc.x || 0;
+                currentAccel.y = acc.y || 0;
+                currentAccel.z = acc.z || 0;
+                document.getElementById('valAccel').textContent = 
+                    `${currentAccel.x.toFixed(2)}, ${currentAccel.y.toFixed(2)}, ${currentAccel.z.toFixed(2)}`;
+            }
+        }
+
+        btnStop.addEventListener('click', () => {
+            isRecording = false;
+            clearInterval(pointInterval);
+            navigator.geolocation.clearWatch(geoWatchId);
+            window.removeEventListener("devicemotion", handleMotion, true);
+
+            btnStart.style.display = 'block';
+            btnStop.style.display = 'none';
+            btnExport.style.display = 'block';
+            btnSync.style.display = 'block';
+            document.getElementById('tripLabel').disabled = false;
+
+            statusInd.textContent = `✅ Stopped. Collected ${tripPoints.length} points.`;
+            statusInd.classList.remove('recording');
+        });
+
+        // Export as JSON file
+        btnExport.addEventListener('click', () => {
+            const label = document.getElementById('tripLabel').value;
+            const tripData = {
+                trip_id: `trip_${Date.now()}`,
+                label: label,
+                start_time: tripStartTime,
+                end_time: new Date().toISOString(),
+                points: tripPoints
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tripData));
+            const node = document.createElement('a');
+            node.setAttribute("href", dataStr);
+            node.setAttribute("download", `${label}_${tripData.trip_id}.json`);
+            document.body.appendChild(node);
+            node.click();
+            node.remove();
+        });
+
+        // Sync directly to Fusion API
+        btnSync.addEventListener('click', async () => {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const label = document.getElementById('tripLabel').value;
+            
+            const tripData = {
+                trip_id: `trip_${Date.now()}`,
+                label: label,
+                start_time: tripStartTime,
+                end_time: new Date().toISOString(),
+                points: tripPoints
+            };
+
+            btnSync.textContent = "Syncing...";
+            btnSync.disabled = true;
+
+            try {
+                const response = await fetch(serverUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tripData)
+                });
+                
+                if (response.ok) {
+                    alert("Trip synced successfully!");
+                    statusInd.textContent = "✅ Synced to server.";
+                } else {
+                    const err = await response.text();
+                    alert("Sync failed: " + err);
+                }
+            } catch (e) {
+                alert("Network error: " + e.message + "\nAre you on the same WiFi network as the server?");
+            } finally {
+                btnSync.textContent = "Sync to Server";
+                btnSync.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

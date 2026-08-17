@@ -1,0 +1,562 @@
+{
+  "Salem City": {
+    "violent_crimes": 1340,
+    "total_ipc_crimes": 4504,
+    "year": "2014",
+    "normalized_score": 100.0,
+    "state_rank": 1,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Madurai": {
+    "violent_crimes": 1292,
+    "total_ipc_crimes": 8212,
+    "year": "2014",
+    "normalized_score": 96.38,
+    "state_rank": 2,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thirunelveli": {
+    "violent_crimes": 905,
+    "total_ipc_crimes": 8490,
+    "year": "2014",
+    "normalized_score": 67.17,
+    "state_rank": 3,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Villupuram": {
+    "violent_crimes": 818,
+    "total_ipc_crimes": 9643,
+    "year": "2014",
+    "normalized_score": 60.6,
+    "state_rank": 4,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Chennai": {
+    "violent_crimes": 802,
+    "total_ipc_crimes": 16861,
+    "year": "2014",
+    "normalized_score": 59.4,
+    "state_rank": 5,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Dindigul": {
+    "violent_crimes": 607,
+    "total_ipc_crimes": 6250,
+    "year": "2014",
+    "normalized_score": 44.68,
+    "state_rank": 6,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thanjavur": {
+    "violent_crimes": 534,
+    "total_ipc_crimes": 6225,
+    "year": "2014",
+    "normalized_score": 39.17,
+    "state_rank": 7,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thoothugudi": {
+    "violent_crimes": 495,
+    "total_ipc_crimes": 5344,
+    "year": "2014",
+    "normalized_score": 36.23,
+    "state_rank": 8,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Vellore": {
+    "violent_crimes": 460,
+    "total_ipc_crimes": 10492,
+    "year": "2014",
+    "normalized_score": 33.58,
+    "state_rank": 9,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Sivagangai": {
+    "violent_crimes": 416,
+    "total_ipc_crimes": 3738,
+    "year": "2014",
+    "normalized_score": 30.26,
+    "state_rank": 10,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Kanyakumari": {
+    "violent_crimes": 412,
+    "total_ipc_crimes": 4041,
+    "year": "2014",
+    "normalized_score": 29.96,
+    "state_rank": 11,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Dharmapuri": {
+    "violent_crimes": 405,
+    "total_ipc_crimes": 4354,
+    "year": "2014",
+    "normalized_score": 29.43,
+    "state_rank": 12,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Krishnagiri": {
+    "violent_crimes": 371,
+    "total_ipc_crimes": 5095,
+    "year": "2014",
+    "normalized_score": 26.87,
+    "state_rank": 13,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Cuddalore": {
+    "violent_crimes": 368,
+    "total_ipc_crimes": 9442,
+    "year": "2014",
+    "normalized_score": 26.64,
+    "state_rank": 14,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thiruvannamalai": {
+    "violent_crimes": 334,
+    "total_ipc_crimes": 4411,
+    "year": "2014",
+    "normalized_score": 24.08,
+    "state_rank": 15,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Madurai City": {
+    "violent_crimes": 332,
+    "total_ipc_crimes": 3226,
+    "year": "2014",
+    "normalized_score": 23.92,
+    "state_rank": 16,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Salem": {
+    "violent_crimes": 312,
+    "total_ipc_crimes": 4696,
+    "year": "2014",
+    "normalized_score": 22.42,
+    "state_rank": 17,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Coimbatore City": {
+    "violent_crimes": 294,
+    "total_ipc_crimes": 4281,
+    "year": "2014",
+    "normalized_score": 21.06,
+    "state_rank": 18,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Theni": {
+    "violent_crimes": 293,
+    "total_ipc_crimes": 4554,
+    "year": "2014",
+    "normalized_score": 20.98,
+    "state_rank": 19,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Kanchipuram": {
+    "violent_crimes": 285,
+    "total_ipc_crimes": 8066,
+    "year": "2014",
+    "normalized_score": 20.38,
+    "state_rank": 20,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Ramnathapuram": {
+    "violent_crimes": 281,
+    "total_ipc_crimes": 3819,
+    "year": "2014",
+    "normalized_score": 20.08,
+    "state_rank": 21,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Virudhunagar": {
+    "violent_crimes": 279,
+    "total_ipc_crimes": 4285,
+    "year": "2014",
+    "normalized_score": 19.92,
+    "state_rank": 22,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Coimbatore": {
+    "violent_crimes": 273,
+    "total_ipc_crimes": 4996,
+    "year": "2014",
+    "normalized_score": 19.47,
+    "state_rank": 23,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Pudukottai": {
+    "violent_crimes": 261,
+    "total_ipc_crimes": 3720,
+    "year": "2014",
+    "normalized_score": 18.57,
+    "state_rank": 24,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Nagapattinam": {
+    "violent_crimes": 247,
+    "total_ipc_crimes": 4386,
+    "year": "2014",
+    "normalized_score": 17.51,
+    "state_rank": 25,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Tiruppur": {
+    "violent_crimes": 240,
+    "total_ipc_crimes": 4049,
+    "year": "2014",
+    "normalized_score": 16.98,
+    "state_rank": 26,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Trichy": {
+    "violent_crimes": 236,
+    "total_ipc_crimes": 4688,
+    "year": "2014",
+    "normalized_score": 16.68,
+    "state_rank": 27,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Erode": {
+    "violent_crimes": 230,
+    "total_ipc_crimes": 4370,
+    "year": "2014",
+    "normalized_score": 16.23,
+    "state_rank": 28,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Namakkal": {
+    "violent_crimes": 230,
+    "total_ipc_crimes": 4003,
+    "year": "2014",
+    "normalized_score": 16.23,
+    "state_rank": 29,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thirunelveli City": {
+    "violent_crimes": 220,
+    "total_ipc_crimes": 1623,
+    "year": "2014",
+    "normalized_score": 15.47,
+    "state_rank": 30,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thiruvarur": {
+    "violent_crimes": 181,
+    "total_ipc_crimes": 4041,
+    "year": "2014",
+    "normalized_score": 12.53,
+    "state_rank": 31,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Thiruvallur": {
+    "violent_crimes": 179,
+    "total_ipc_crimes": 4037,
+    "year": "2014",
+    "normalized_score": 12.38,
+    "state_rank": 32,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Tiruppur City": {
+    "violent_crimes": 176,
+    "total_ipc_crimes": 2490,
+    "year": "2014",
+    "normalized_score": 12.15,
+    "state_rank": 33,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Ariyalur": {
+    "violent_crimes": 128,
+    "total_ipc_crimes": 1615,
+    "year": "2014",
+    "normalized_score": 8.53,
+    "state_rank": 34,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Trichy City": {
+    "violent_crimes": 108,
+    "total_ipc_crimes": 3074,
+    "year": "2014",
+    "normalized_score": 7.02,
+    "state_rank": 35,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Perambalur": {
+    "violent_crimes": 105,
+    "total_ipc_crimes": 1770,
+    "year": "2014",
+    "normalized_score": 6.79,
+    "state_rank": 36,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Karur": {
+    "violent_crimes": 103,
+    "total_ipc_crimes": 2241,
+    "year": "2014",
+    "normalized_score": 6.64,
+    "state_rank": 37,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Nilgiris": {
+    "violent_crimes": 86,
+    "total_ipc_crimes": 1199,
+    "year": "2014",
+    "normalized_score": 5.36,
+    "state_rank": 38,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Railway Chennai": {
+    "violent_crimes": 38,
+    "total_ipc_crimes": 637,
+    "year": "2014",
+    "normalized_score": 1.74,
+    "state_rank": 39,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  },
+  "Railway Trichy": {
+    "violent_crimes": 15,
+    "total_ipc_crimes": 229,
+    "year": "2014",
+    "normalized_score": 0.0,
+    "state_rank": 40,
+    "state_district_count": 40,
+    "normalization": {
+      "method": "min-max across Tamil Nadu districts",
+      "min_violent": 15,
+      "max_violent": 1340,
+      "formula": "(violent_crimes - min) / (max - min) × 100"
+    }
+  }
+}

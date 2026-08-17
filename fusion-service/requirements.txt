@@ -1,0 +1,40 @@
+# ============================================================
+# STREEVA — Risk Fusion Engine
+# Python Dependencies
+# ============================================================
+# Install: pip install -r requirements.txt
+#
+# Note: tflite-runtime has no Windows wheel. tensorflow-cpu
+# is the correct provider of tf.lite.Interpreter on Windows.
+# ============================================================
+
+# --- Web Framework ---
+fastapi
+uvicorn[standard]
+
+# --- Data Validation ---
+pydantic
+pydantic-settings
+
+# --- Database ---
+sqlalchemy
+
+# --- Configuration ---
+pyyaml
+
+# --- HTTP Client ---
+httpx
+
+# --- Data / ML ---
+numpy
+pandas
+tensorflow-cpu      # Provides tf.lite on Windows (tflite-runtime unsupported on Windows)
+scikit-learn
+
+# --- WebSocket client (for demo_replay.py script) ---
+websockets
+
+# --- Testing ---
+pytest
+pytest-asyncio
+pytest-mock
