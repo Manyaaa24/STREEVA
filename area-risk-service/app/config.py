@@ -40,6 +40,12 @@ class Settings(BaseSettings):
         description="Google Places API (New) key. Required for live POI data.",
     )
 
+    # ── TomTom API ───────────────────────────────────────────────────────────
+    tomtom_api_key: str = Field(
+        default="",
+        description="TomTom Traffic Flow API key.",
+    )
+
     # ── Logging ──────────────────────────────────────────────────────────────
     log_level: str = Field(default="INFO", description="Logging level.")
     environment: str = Field(default="development", description="App environment.")
@@ -83,6 +89,11 @@ class Settings(BaseSettings):
     def has_places_key(self) -> bool:
         """True if a non-empty Google Places API key is configured."""
         return bool(self.google_places_api_key.strip())
+
+    @property
+    def has_tomtom_key(self) -> bool:
+        """True if a non-empty TomTom API key is configured."""
+        return bool(self.tomtom_api_key.strip())
 
 
 class ScoringWeights:

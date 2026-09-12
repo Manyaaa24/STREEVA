@@ -17,10 +17,12 @@ Then open:
 from __future__ import annotations
 
 import time
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import router
 from app.config import get_settings
@@ -29,6 +31,35 @@ from app.utils.logger import configure_logging, get_logger
 # Configure structured logging at import time
 configure_logging()
 logger = get_logger(__name__)
+
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    settings = get_settings()
+    logger.info(
+        "service_started",
+        service="streeva-area-risk",
+        version="1.0.0",
+        environment=settings.environment,
+        places_key_configured=settings.has_places_key,
+    )
+    try:
+        from app.services.macro_baseline_service import _load_district_lookup
+        _load_district_lookup()
+    except Exception as exc:
+        logger.warning("startup_ncrb_preload_failed", error=str(exc))
+
+    try:
+        from app.services.population_service import _load_raster_stats
+        _load_raster_stats()
+    except Exception as exc:
+        logger.warning("startup_worldpop_preload_failed", error=str(exc))
+
+    yield
+
+    logger.info("service_stopped", service="streeva-area-risk")
 
 
 def create_app() -> FastAPI:
@@ -40,55 +71,20 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="STREEVA — Area Risk Scoring Engine",
+        lifespan=lifespan,
         description="""
 ## Overview
 Hyperlocal area safety risk scoring service for Chennai, India.
-
-Given a **latitude**, **longitude**, and **hour of day**, returns a risk score
-(0–100) with a full explainable breakdown of contributing factors.
-
-## Architecture
-- **Layer 1 — Macro Baseline**: NCRB district-level IPC crime data (2014)
-- **Layer 2 — Hyperlocal Intelligence**: OpenStreetMap road network + Google Places POIs + WorldPop population density
-
-## Data Sources
-| Source | Used For |
-|--------|----------|
-| NCRB 2014 (data.gov.in) | Crime baseline per district |
-| OpenStreetMap (OSMnx) | Road type, density, isolation |
-| Google Places API (New) | Commercial density, police/hospital proximity |
-| WorldPop 2020 (100m) | Population density |
-
-## Validation
-No geocoded crime incident data exists for India at point level.
-This service uses proxy signals to estimate safety. Scores are validated
-qualitatively: busy commercial roads should score lower than isolated lanes.
-See README.md for the full methodology and limitations.
-
-## Future Extensions
-The `/area-risk` endpoint consumes `BaseRiskScorer`. Replace `WeightedRiskScorer`
-with an ML model by implementing the same interface — no API changes required.
-        """,
+""",
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
-        openapi_tags=[
-            {
-                "name": "Risk Scoring",
-                "description": "Area risk score computation endpoints.",
-            },
-            {
-                "name": "Operations",
-                "description": "Health, cache, and operational endpoints.",
-            },
-        ],
     )
 
     # ── CORS ─────────────────────────────────────────────────────────────────
-    # Allows the mobile app / risk fusion engine to call this service
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Restrict to specific origins in production
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["GET"],
         allow_headers=["*"],
@@ -120,32 +116,14 @@ with an ML model by implementing the same interface — no API changes required.
     # ── Routes ────────────────────────────────────────────────────────────────
     app.include_router(router)
 
-    # ── Startup / Shutdown events ──────────────────────────────────────────────
-    @app.on_event("startup")
-    async def startup_event():
-        logger.info(
-            "service_started",
-            service="streeva-area-risk",
-            version="1.0.0",
-            environment=settings.environment,
-            places_key_configured=settings.has_places_key,
-        )
-        # Pre-warm: load NCRB lookup and WorldPop raster stats at startup
-        try:
-            from app.services.macro_baseline_service import _load_district_lookup
-            _load_district_lookup()
-        except Exception as exc:
-            logger.warning("startup_ncrb_preload_failed", error=str(exc))
+    # ── Serve Web UI at / ─────────────────────────────────────────────────────
+    static_dir = Path(__file__).parent / "static"
+    if static_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-        try:
-            from app.services.population_service import _load_raster_stats
-            _load_raster_stats()
-        except Exception as exc:
-            logger.warning("startup_worldpop_preload_failed", error=str(exc))
-
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        logger.info("service_stopped", service="streeva-area-risk")
+        @app.get("/", include_in_schema=False)
+        async def serve_ui():
+            return FileResponse(static_dir / "index.html")
 
     return app
 

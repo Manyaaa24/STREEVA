@@ -27,21 +27,26 @@ class AreaRiskRequest(BaseModel):
         ge=-90.0,
         le=90.0,
         description="Latitude in WGS-84 decimal degrees.",
-        examples=[12.9141],
     )
     lng: float = Field(
         ...,
         ge=-180.0,
         le=180.0,
         description="Longitude in WGS-84 decimal degrees.",
-        examples=[80.1408],
     )
-    hour: int = Field(
-        ...,
+    timestamp: str | None = Field(
+        None,
+        description="Optional ISO 8601 timestamp (e.g. 2026-09-11T18:02:00+05:30). If omitted, derived from server time.",
+    )
+    hour: int | None = Field(
+        None,
         ge=0,
         le=23,
-        description="Hour of day in 24-hour format (0–23).",
-        examples=[22],
+        description="Optional hour of day (0–23). Derived from timestamp or current local time if omitted.",
+    )
+    timezone: str | None = Field(
+        "Asia/Kolkata",
+        description="Timezone identifier for local time calculation (default: Asia/Kolkata).",
     )
 
 
@@ -120,12 +125,33 @@ class AreaRiskResponse(BaseModel):
         description="UTC timestamp when this score was computed.",
     )
     query: dict[str, Any] = Field(
-        description="Echo of the original query parameters.",
-        examples=[{"lat": 12.9141, "lng": 80.1408, "hour": 22}],
+        description="Echo of the original query parameters including dynamic lat, lng, timestamp, timezone, and calculated hour.",
+        examples=[{
+            "lat": 13.0674,
+            "lng": 80.2376,
+            "timestamp": "2026-09-11T18:02:00+05:30",
+            "timezone": "Asia/Kolkata",
+            "hour": 18
+        }],
     )
     scorer: str = Field(
         description="Name and version of the scorer that produced this result.",
         examples=["WeightedRiskScorer v1.0.0"],
+    )
+    input_signals: dict[str, float] | None = Field(
+        None, description="Raw 0-100 feature scores fed to the model."
+    )
+    risk_factors: dict[str, float] | None = Field(
+        None, description="SHAP feature attributions explaining the score (ML Scorer)."
+    )
+    crime_meta: dict[str, Any] | None = Field(
+        None, description="Information about the macro crime baseline resolution."
+    )
+    model_limitations: list[str] | None = Field(
+        None, description="Known structural limitations triggered by this location."
+    )
+    traffic_signal: dict[str, Any] | None = Field(
+        None, description="Real-time traffic flow metrics from TomTom Traffic Flow API."
     )
 
     model_config = {
@@ -149,9 +175,15 @@ class AreaRiskResponse(BaseModel):
                     "multiplier": 1.40,
                 },
                 "data_completeness": 94,
-                "computed_at": "2026-07-22T22:00:00+05:30",
-                "query": {"lat": 12.9141, "lng": 80.1408, "hour": 22},
-                "scorer": "WeightedRiskScorer v1.0.0",
+                "computed_at": "2026-09-11T18:02:00+05:30",
+                "query": {
+                    "lat": 13.0674,
+                    "lng": 80.2376,
+                    "timestamp": "2026-09-11T18:02:00+05:30",
+                    "timezone": "Asia/Kolkata",
+                    "hour": 18
+                },
+                "scorer": "LGBBProxyScorer v1.1.0-ml",
             }
         }
     }

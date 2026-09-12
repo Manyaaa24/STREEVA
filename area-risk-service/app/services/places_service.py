@@ -159,11 +159,26 @@ def _osm_fallback_amenity(
                 elat, elng = el["center"]["lat"], el["center"]["lon"]
             else:
                 continue
+
+            tags = el.get("tags", {})
+            name = str(tags.get("name", "")).strip()
+            police_tag = str(tags.get("police", "")).lower()
+            name_lower = name.lower()
+
+            if amenity_tag == "police":
+                # Exclude checkpoints, ranges, training areas, booths, outposts (Bug 4 fix)
+                if police_tag in ("checkpoint", "range", "training_area", "booth", "outpost", "check_post"):
+                    continue
+                if any(bad in name_lower for bad in ("checkpoint", "check post", "training", "range", "booth", "outpost", "out post")):
+                    continue
+                if not name and police_tag not in ("station", "police_station"):
+                    continue
+
             results.append({
                 "location": {"latitude": elat, "longitude": elng},
                 "types": [amenity_tag],
                 "businessStatus": "OPERATIONAL",
-                "displayName": {"text": el.get("tags", {}).get("name", amenity_tag)},
+                "displayName": {"text": name or amenity_tag},
             })
         return results
     except Exception as exc:

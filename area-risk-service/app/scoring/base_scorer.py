@@ -45,14 +45,29 @@ class FeatureSet:
     police_distance_score: float     # From Google Places (sigmoid distance)
     hospital_distance_score: float   # From Google Places (sigmoid distance)
     population_density_score: float  # From WorldPop raster (inverted)
+    nightlight_mean_score: float     # From VIIRS (inverted: darker = higher risk)
 
-    # Time-of-day multiplier (explicit, not hidden in formula)
-    time_multiplier: float
+    # Time-of-day features
+    time_multiplier: float           # Legacy: explicit weight
     time_band_name: str
     time_band_label: str
 
+    @property
+    def hour_sin(self) -> float:
+        import math
+        return math.sin(2 * math.pi * self.hour / 24.0)
+
+    @property
+    def hour_cos(self) -> float:
+        import math
+        return math.cos(2 * math.pi * self.hour / 24.0)
+
     # Data quality metadata
     fallback_features: list[str]     # Features that used fallback data
+
+    # Live Traffic Signal (TomTom Flow)
+    traffic_congestion_ratio: float = -1.0   # currentSpeed / freeFlowSpeed (0.0–1.0, -1.0 if N/A)
+    traffic_confidence: str = "no_key"        # "live" | "live_cached" | "stale_cache" | "no_road" | "api_error" | "no_key"
 
 
 @dataclass
@@ -68,6 +83,11 @@ class RiskResult:
     data_completeness: int           # % of features with primary data (0–100)
     feature_set: FeatureSet          # Raw feature values (for logging/debug)
     time_band_info: dict[str, Any]   # Time band metadata for explainability
+    input_signals: dict[str, float] | None = None
+    risk_factors: dict[str, float] | None = None
+    crime_meta: dict[str, Any] | None = None
+    model_limitations: list[str] | None = None
+    traffic_signal: dict[str, Any] | None = None
 
 
 class BaseRiskScorer(ABC):

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREEVA — Dynamic Safety Risk Scorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-purple: #818cf8;
+            --risk-low: #10b981;
+            --risk-medium: #f59e0b;
+            --risk-high: #f97316;
+            --risk-critical: #ef4444;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, #0284c7, #4f46e5);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-banner {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: #fca5a5;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-box {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+
+        .info-box label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        .info-box .value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        .results-section {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .score-hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+        }
+
+        .score-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-number {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-low { background: rgba(16, 185, 129, 0.2); color: var(--risk-low); border: 1px solid var(--risk-low); }
+        .badge-medium { background: rgba(245, 158, 11, 0.2); color: var(--risk-medium); border: 1px solid var(--risk-medium); }
+        .badge-high { background: rgba(249, 115, 22, 0.2); color: var(--risk-high); border: 1px solid var(--risk-high); }
+        .badge-critical { background: rgba(239, 68, 68, 0.2); color: var(--risk-critical); border: 1px solid var(--risk-critical); }
+
+        .factor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .factor-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+        }
+
+        .factor-row:last-child {
+            border-bottom: none;
+        }
+
+        .factor-name {
+            color: var(--text-muted);
+        }
+
+        .factor-val {
+            font-weight: 600;
+        }
+
+        .raw-json {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.78rem;
+            color: #38bdf8;
+            overflow-x: auto;
+            max-height: 250px;
+        }
+
+        .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>STREEVA Risk Engine</h1>
+            <p>Hyperlocal Real-Time Safety Risk Assessment</p>
+        </header>
+
+        <div class="card">
+            <button id="btnCheckRisk" class="btn-primary">
+                <span id="btnIcon">📍</span>
+                <span id="btnText">Check Risk</span>
+            </button>
+
+            <div id="errorBanner" class="error-banner" style="margin-top: 1rem;"></div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <label>Location Detected</label>
+                    <div id="dispLocation" class="value">Not requested</div>
+                </div>
+                <div class="info-box">
+                    <label>Time Used</label>
+                    <div id="dispTime" class="value">Not requested</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="card results-section">
+            <div id="scoreHero" class="score-hero">
+                <div class="score-display">
+                    <div id="scoreVal" class="score-number">--</div>
+                    <div class="score-label">Area Risk Score (0–100)</div>
+                </div>
+                <div id="badgeCls" class="badge">--</div>
+            </div>
+
+            <div id="limitationBanner" class="error-banner" style="background-color: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fcd34d; margin-top: 0;"></div>
+
+            <div>
+                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">Risk Breakdown</h3>
+                <div class="factor-list" id="factorList"></div>
+            </div>
+
+            <div>
+                <h3 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">Verified Query Context</h3>
+                <pre id="rawJson" class="raw-json"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btnCheckRisk = document.getElementById('btnCheckRisk');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const errorBanner = document.getElementById('errorBanner');
+        const dispLocation = document.getElementById('dispLocation');
+        const dispTime = document.getElementById('dispTime');
+        const resultsSection = document.getElementById('resultsSection');
+        const scoreVal = document.getElementById('scoreVal');
+        const badgeCls = document.getElementById('badgeCls');
+        const factorList = document.getElementById('factorList');
+        const rawJson = document.getElementById('rawJson');
+
+        function formatIST(date) {
+            // Format current time in Asia/Kolkata timezone
+            return date.toLocaleString('en-US', {
+                timeZone: 'Asia/Kolkata',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            }) + ' IST';
+        }
+
+        btnCheckRisk.addEventListener('click', () => {
+            errorBanner.style.display = 'none';
+            btnCheckRisk.disabled = true;
+            btnText.textContent = 'Getting Location & Computing...';
+            btnIcon.outerHTML = '<div id="btnIcon" class="spinner"></div>';
+
+            if (!navigator.geolocation) {
+                showError("Geolocation is not supported by your browser. Please enable location services.");
+                resetBtn();
+                return;
+            }
+
+            // Step 1: Request Geolocation
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const now = new Date();
+                    const isoTimestamp = now.toISOString();
+
+                    // Display detected location and time in UI
+                    dispLocation.innerHTML = `Lat: ${lat.toFixed(4)}<br>Lng: ${lng.toFixed(4)}`;
+                    dispTime.textContent = formatIST(now);
+
+                    // Step 2: Query API with dynamic coordinates and timestamp
+                    try {
+                        const url = `/area-risk?lat=${lat}&lng=${lng}&timestamp=${encodeURIComponent(isoTimestamp)}&timezone=Asia/Kolkata`;
+                        const res = await fetch(url);
+
+                        if (!res.ok) {
+                            const errData = await res.json();
+                            throw new Error(errData.detail || `Server returned error ${res.status}`);
+                        }
+
+                        const data = await res.json();
+                        renderResults(data);
+
+                    } catch (err) {
+                        showError(`Failed to compute risk score: ${err.message}`);
+                    } finally {
+                        resetBtn();
+                    }
+                },
+                (error) => {
+                    let msg = "Location permission was denied or unavailable. Please grant location permission in your browser to calculate safety risk.";
+                    if (error.code === error.PERMISSION_DENIED) {
+                        msg = "❌ Location permission denied. Please allow location access in browser settings and try again.";
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        msg = "⚠️ Location information is unavailable. Please check your GPS settings.";
+                    } else if (error.code === error.TIMEOUT) {
+                        msg = "⏱️ Geolocation request timed out. Please try again.";
+                    }
+                    showError(msg);
+                    resetBtn();
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+
+        function showError(msg) {
+            errorBanner.textContent = msg;
+            errorBanner.style.display = 'block';
+            resultsSection.style.display = 'none';
+        }
+
+        function resetBtn() {
+            btnCheckRisk.disabled = false;
+            btnText.textContent = 'Check Risk';
+            const spinner = document.getElementById('btnIcon');
+            if (spinner) {
+                spinner.outerHTML = '<span id="btnIcon">📍</span>';
+            }
+        }
+
+        function renderResults(data) {
+            scoreVal.textContent = data.risk_score.toFixed(1);
+            
+            const cls = data.classification;
+            badgeCls.textContent = cls;
+            badgeCls.className = `badge badge-${cls.toLowerCase()}`;
+
+            if (cls === 'Low') scoreVal.style.color = 'var(--risk-low)';
+            else if (cls === 'Medium') scoreVal.style.color = 'var(--risk-medium)';
+            else if (cls === 'High') scoreVal.style.color = 'var(--risk-high)';
+            else if (cls === 'Critical') scoreVal.style.color = 'var(--risk-critical)';
+
+            // Contributing factors / ML break down
+            const isML = data.scorer && data.scorer.toLowerCase().includes('ml');
+            let html = '';
+
+            const inputLabels = {
+                crime_baseline: "Crime Baseline Score",
+                isolation: "Road Isolation Score",
+                commercial_density: "Commercial Density Risk",
+                police_distance: "Distance to Police Station",
+                hospital_distance: "Distance to Hospital",
+                population_density: "Population Density Risk",
+                nightlight_mean: "Nightlight Score"
+            };
+
+            const shapLabels = {
+                base_value: "Model Base Output",
+                isolation: "Road Isolation",
+                commercial_density: "Commercial Density",
+                police_distance: "Distance to Police Station",
+                hospital_distance: "Distance to Hospital",
+                population_density: "Population Density",
+                nightlight_mean: "Nightlight",
+                time_variance_sin: "Time-of-day Variance (Sin)",
+                time_variance_cos: "Time-of-day Variance (Cos)"
+            };
+
+            if (isML && data.input_signals && data.risk_factors) {
+                // Section 1: Input Signals
+                html += '<h4 style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-muted);">Input Signals (0-100 scale)</h4>';
+                html += Object.entries(data.input_signals).map(([key, val]) => `
+                    <div class="factor-row">
+                        <span class="factor-name">${inputLabels[key] || key}</span>
+                        <span class="factor-val">${val.toFixed(2)}</span>
+                    </div>
+                `).join('');
+
+                // Section 2: SHAP Contributions
+                html += '<h4 style="font-size: 0.85rem; margin-top: 1.5rem; color: var(--text-muted);">Why This Score (SHAP Contributions)</h4>';
+                html += '<p style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; margin-bottom: 0.75rem; font-style: italic;">Contributions show how this location differs from a typical hex in the training data, not an absolute safety judgment per feature.</p>';
+                html += Object.entries(data.risk_factors).map(([key, val]) => `
+                    <div class="factor-row">
+                        <span class="factor-name">${shapLabels[key] || key}</span>
+                        <span class="factor-val">${val >= 0 ? '+' : ''}${val.toFixed(2)} pts</span>
+                    </div>
+                `).join('');
+            } else {
+                // Legacy Weighted Breakdown
+                const factors = data.contributing_factors || {};
+                const labels = {
+                    crime_baseline: "Crime Baseline Score",
+                    isolation: "Road Isolation Score",
+                    commercial_density: "Commercial Density Risk",
+                    police_distance: "Distance to Police Station",
+                    hospital_distance: "Distance to Hospital",
+                    population_density: "Population Density Risk",
+                    time_multiplier_boost: "Time-of-day Multiplier Boost"
+                };
+
+                html += Object.entries(factors).map(([key, val]) => `
+                    <div class="factor-row">
+                        <span class="factor-name">${labels[key] || key}</span>
+                        <span class="factor-val">${val >= 0 ? '+' : ''}${val.toFixed(2)} pts</span>
+                    </div>
+                `).join('');
+            }
+            factorList.innerHTML = html;
+
+            // Model limitations banner
+            const limitationWrap = document.getElementById('limitationBanner');
+            if (data.model_limitations && data.model_limitations.length > 0) {
+                limitationWrap.innerHTML = `<strong>Model Note:</strong> ${data.model_limitations.join('<br>')}`;
+                limitationWrap.style.display = 'block';
+            } else {
+                limitationWrap.style.display = 'none';
+            }
+
+            // Display query details
+            rawJson.textContent = JSON.stringify({
+                risk_score: data.risk_score,
+                classification: data.classification,
+                query: data.query,
+                time_band: data.time_band,
+                data_completeness: `${data.data_completeness}%`,
+                scorer: data.scorer,
+                crime_meta: data.crime_meta
+            }, null, 2);
+
+            resultsSection.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

@@ -99,20 +99,34 @@ def _load_district_lookup() -> dict[str, Any]:
         return {}
 
 
-def get_macro_baseline_score(district: str | None = None) -> tuple[float, dict[str, Any]]:
+def get_macro_baseline_score(district: str | None = None, lat: float | None = None, lng: float | None = None) -> tuple[float, dict[str, Any]]:
     """
     Return the macro crime baseline risk score (0–100) for a district.
 
     Args:
         district: District name matching NCRB data (e.g. 'Chennai').
-                  If None, uses the city config's ncrb_district_key.
+                  If None, attempts to resolve via lat/lng, then falls back to city config.
+        lat: Optional latitude to resolve district.
+        lng: Optional longitude to resolve district.
 
     Returns:
         Tuple of (baseline_score_0_to_100, metadata_dict).
         Returns (50.0, {...}) as neutral baseline if data is unavailable.
     """
     city_config = get_city_config()
-    lookup_key = district or city_config.ncrb_district_key
+    lookup_key = district
+    
+    if lookup_key is None and lat is not None and lng is not None:
+        try:
+            from app.services.district_service import get_district_for_location
+            resolved_district = get_district_for_location(lat, lng)
+            if resolved_district:
+                lookup_key = resolved_district
+        except Exception as exc:
+            logger.error("district_resolution_failed", error=str(exc))
+            
+    if lookup_key is None:
+        lookup_key = city_config.ncrb_district_key
 
     lookup = _load_district_lookup()
 
@@ -152,4 +166,5 @@ def get_macro_baseline_score(district: str | None = None) -> tuple[float, dict[s
         "normalized_score": score,
         "state_rank": district_data.get("state_rank"),
         "state_district_count": district_data.get("state_district_count"),
+        "note": district_data.get("data_year_note"),
     }
